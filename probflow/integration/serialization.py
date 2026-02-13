@@ -71,6 +71,8 @@ def save_model(
 
 def load_model(
     filepath: Union[str, Path],
+    *,
+    allow_pickle: bool = False,
 ) -> BeliefNetwork:
     """Reconstruct a :class:`BeliefNetwork` from a JSON file.
 
@@ -83,6 +85,10 @@ def load_model(
     ----------
     filepath : str or Path
         Path to a JSON file previously written by :func:`save_model`.
+    allow_pickle : bool, optional
+        If *True*, allow loading pickle-serialized objects (e.g.,
+        callable CPDs).  **Warning**: unpickling data from untrusted
+        sources can execute arbitrary code.  Default is *False*.
 
     Returns
     -------
@@ -94,8 +100,9 @@ def load_model(
     FileNotFoundError
         If *filepath* does not exist.
     ValueError
-        If the file is corrupted, contains cycles, or violates
-        probability constraints.
+        If the file is corrupted, contains cycles, violates
+        probability constraints, or contains pickle data when
+        *allow_pickle* is *False*.
     """
     filepath = Path(filepath)
     if not filepath.exists():
@@ -107,7 +114,7 @@ def load_model(
     except json.JSONDecodeError as exc:
         raise ValueError(f"Corrupted model file: {exc}") from exc
 
-    return _dict_to_network(data)
+    return _dict_to_network(data, allow_pickle=allow_pickle)
 
 
 # ------------------------------------------------------------------ #
@@ -161,7 +168,11 @@ def _network_to_dict(network: BeliefNetwork) -> Dict[str, Any]:
     }
 
 
-def _dict_to_network(data: Dict[str, Any]) -> BeliefNetwork:
+def _dict_to_network(
+    data: Dict[str, Any],
+    *,
+    allow_pickle: bool = False,
+) -> BeliefNetwork:
     """Reconstruct a BeliefNetwork from a deserialized dictionary."""
     # --- version handling ---
     version = data.get("format_version")
@@ -205,6 +216,12 @@ def _dict_to_network(data: Dict[str, Any]) -> BeliefNetwork:
         if dist_type == "array":
             distribution = np.array(raw_dist, dtype=np.float64)
         elif dist_type == "pickle":
+            if not allow_pickle:
+                raise ValueError(
+                    f"Node '{name}' uses pickle serialization. "
+                    f"Set allow_pickle=True to load pickle data. "
+                    f"Warning: only load pickle data from trusted sources."
+                )
             pickled_bytes = base64.b64decode(raw_dist)
             distribution = pickle.loads(pickled_bytes)  # noqa: S301
         else:
@@ -216,7 +233,7 @@ def _dict_to_network(data: Dict[str, Any]) -> BeliefNetwork:
         if isinstance(distribution, np.ndarray):
             _validate_probabilities(name, distribution, parents)
 
-        if callable(distribution) and not isinstance(distribution, np.ndarray):
+        if callable(distribution):
             # Callable CPDs cannot go through add_node() which calls
             # np.asarray; inject directly into the network internals.
             num_states = len(states) if states else 2

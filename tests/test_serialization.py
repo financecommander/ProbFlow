@@ -431,9 +431,27 @@ class TestPickleFallback:
         b_node = [n for n in data["nodes"] if n["name"] == "B"][0]
         assert b_node["distribution_type"] == "pickle"
 
-        loaded = load_model(filepath)
+        loaded = load_model(filepath, allow_pickle=True)
         # The callable is restored
         restored_cpd = loaded._cpds["B"]
         assert callable(restored_cpd)
         np.testing.assert_allclose(restored_cpd(0), [0.8, 0.2])
         np.testing.assert_allclose(restored_cpd(1), [0.3, 0.7])
+
+    def test_pickle_rejected_by_default(self, tmp_path: Path) -> None:
+        """Pickle data is rejected when allow_pickle is False (default)."""
+        bn = BeliefNetwork()
+        bn.add_node("A", np.array([0.5, 0.5]), states=["a0", "a1"])
+        bn.add_node(
+            "B",
+            np.array([[0.8, 0.2], [0.3, 0.7]]),
+            parents=["A"],
+            states=["b0", "b1"],
+        )
+        bn._cpds["B"] = _sample_callable_cpd  # type: ignore[assignment]
+
+        filepath = tmp_path / "callable.json"
+        save_model(bn, filepath)
+
+        with pytest.raises(ValueError, match="allow_pickle"):
+            load_model(filepath)
