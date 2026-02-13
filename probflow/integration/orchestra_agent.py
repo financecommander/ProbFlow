@@ -258,7 +258,9 @@ class UncertaintyAwareAgent:
 
         # Value of perfect information: potential gain from resolving
         # uncertainty, proportional to remaining uncertainty and the
-        # expected payoff at stake.
+        # expected payoff at stake.  We use abs(expected_utility) because
+        # the benefit of resolving uncertainty applies equally to
+        # avoiding losses (negative utility) and securing gains.
         vpi = (1.0 - probability) * abs(expected_utility)
 
         return vpi > information_cost
@@ -368,12 +370,8 @@ class OrchestraSchedulerAgent(UncertaintyAwareAgent):
     def generate_plans(self, goal, environment, hypothesis):
         """Generate plans based on resource hypothesis."""
         capacity = hypothesis.state.get("available_resources", "medium")
-        if capacity == "high":
-            return [
-                Plan("parallel_deploy", actions=["deploy_all"], cost=5.0),
-                Plan("sequential_deploy", actions=["deploy_one_by_one"], cost=3.0),
-            ]
-        elif capacity == "medium":
+        if capacity in ("high", "medium"):
+            # Both high and medium capacity support all deployment modes
             return [
                 Plan("parallel_deploy", actions=["deploy_all"], cost=5.0),
                 Plan("sequential_deploy", actions=["deploy_one_by_one"], cost=3.0),
