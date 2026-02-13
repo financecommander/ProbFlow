@@ -1,4 +1,9 @@
-"""Tests for probflow.causal.dag – CausalDAG with do-calculus support."""
+"""Tests for probflow.causal.dag – CausalDAG with do-calculus support.
+
+Note: ConditionalDist coerces string labels to float (pre-existing behavior),
+so comparisons on child samples use numeric values (e.g. ``== 1.0``)
+rather than string labels (e.g. ``== "1"``).
+"""
 
 import numpy as np
 import pytest
@@ -133,7 +138,6 @@ class TestDoOperator:
         dag = self._simple_dag()
         intervened = dag.do("X", "1")
         samples = intervened.sample(20_000)
-        # ConditionalDist coerces labels to float (pre-existing behavior)
         y_one_frac = (samples["Y"] == 1.0).mean()
         assert abs(y_one_frac - 0.7) < 0.03
 
@@ -142,7 +146,6 @@ class TestDoOperator:
         dag = self._simple_dag()
         intervened = dag.do("X", "0")
         samples = intervened.sample(20_000)
-        # ConditionalDist coerces labels to float (pre-existing behavior)
         y_one_frac = (samples["Y"] == 1.0).mean()
         assert abs(y_one_frac - 0.2) < 0.03
 
@@ -238,7 +241,6 @@ class TestSimpsonsParadox:
         dag = self._build_simpsons_dag()
 
         # Observational: sample and condition on X=1
-        # ConditionalDist coerces labels to float
         n = 50_000
         obs_samples = dag.sample(n)
         x1_mask = obs_samples["X"] == 1.0
@@ -517,7 +519,6 @@ class TestCounterfactual:
             evidence={"X": "0"},
             n=50_000,
         )
-        # ConditionalDist coerces labels to float (pre-existing behavior)
         y1_frac = (cf["Y"] == 1.0).mean()
         assert abs(y1_frac - 0.9) < 0.05
 
@@ -552,7 +553,6 @@ class TestInterventionalSample:
         dag.add_node("Y", y, parents=["X"])
         samples = dag.interventional_sample({"X": "1"}, n=10_000)
         assert (samples["X"] == "1").all()
-        # ConditionalDist coerces labels to float (pre-existing behavior)
         y1_frac = (samples["Y"] == 1.0).mean()
         assert abs(y1_frac - 0.7) < 0.05
 

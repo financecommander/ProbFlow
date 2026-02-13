@@ -504,15 +504,14 @@ class CausalDAG(BeliefNetwork):
         # 2. No backdoor path from treatment to mediators
         # (i.e., no common cause of treatment and mediator
         #  that is not blocked)
-        confounders = self.find_confounders(treatment, outcome)
         for m in mediators:
-            m_parents = set(self._parents.get(m, []))
             # Mediator should only be reachable from treatment
             m_ancestors = self.ancestors_of(m)
-            # Check no unblocked backdoor between treatment and mediator
-            bad_ancestors = m_ancestors - {treatment} - self.ancestors_of(treatment)
             treatment_ancestors = self.ancestors_of(treatment)
-            if bad_ancestors & treatment_ancestors:
+            # Check no unblocked backdoor between treatment and mediator:
+            # a common ancestor of both that is NOT treatment itself
+            common = (m_ancestors & treatment_ancestors) - {treatment}
+            if common:
                 return None
 
         return mediators
