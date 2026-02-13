@@ -57,7 +57,7 @@ class TestBernoulli:
         b = Bernoulli(0.7)
         assert pytest.approx((a & b).p) == pytest.approx((b & a).p)
 
-    # P(A | B) = P(A) + P(B) - P(A)*P(B) under independence
+    # P(A or B) = P(A) + P(B) - P(A)*P(B) under independence
     def test_or_union_probability(self):
         a = Bernoulli(0.3)
         b = Bernoulli(0.5)

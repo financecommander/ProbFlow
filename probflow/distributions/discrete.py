@@ -127,7 +127,7 @@ class Bernoulli:
         return Bernoulli(self.p * other.p)
 
     def __or__(self, other):
-        """Union probability assuming independence: P(A | B) = P(A) + P(B) - P(A)*P(B).
+        """Union probability assuming independence: P(A or B) = P(A) + P(B) - P(A)*P(B).
 
         Parameters
         ----------
@@ -137,7 +137,7 @@ class Bernoulli:
         Returns
         -------
         Bernoulli
-            A new Bernoulli with p = P(A) + P(B) - P(A)*P(B).
+            A new Bernoulli with p = P(A) + P(B) - P(A)*P(B) (inclusion-exclusion).
         """
         if not isinstance(other, Bernoulli):
             return NotImplemented
@@ -268,8 +268,10 @@ class Categorical:
         -------
         float or numpy.ndarray
         """
-        x = np.asarray(x)
-        result = np.where((x >= 0) & (x < self._k), self.probs[x.clip(0, self._k - 1)], 0.0)
+        x = np.asarray(x, dtype=int)
+        in_range = (x >= 0) & (x < self._k)
+        safe_x = np.where(in_range, x, 0)
+        result = np.where(in_range, self.probs[safe_x], 0.0)
         return float(result) if result.ndim == 0 else result
 
     def cdf(self, x):
