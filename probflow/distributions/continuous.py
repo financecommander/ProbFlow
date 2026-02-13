@@ -194,7 +194,7 @@ class Beta:
 
     def __mul__(self, scalar: float) -> Beta:
         """Scale the support by a constant: if X ~ Beta(a, b) on [loc, loc+scale],
-        then c*X ~ Beta(a, b) on [c*loc, c*scale].
+        then c*X ~ Beta(a, b) on [c*loc, c*loc + c*scale].
         """
         if not isinstance(scalar, (int, float)):
             return NotImplemented

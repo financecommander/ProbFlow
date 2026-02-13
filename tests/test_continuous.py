@@ -53,9 +53,9 @@ class TestNormal:
 
     def test_sigma_zero_cdf(self):
         d = Normal(3.0, 0.0)
-        # CDF should be a step function at mu
+        # CDF is a step function at mu for the degenerate distribution
         assert d.cdf(2.9) == 0.0
-        assert d.cdf(3.0) == 1.0  # scipy convention: CDF(mu)=1 for sigma=0
+        assert d.cdf(3.0) == 1.0
 
     def test_sigma_negative_raises(self):
         with pytest.raises(ValueError, match="non-negative"):
