@@ -91,7 +91,7 @@ class DecisionTree:
     -------
     >>> tree = DecisionTree()
     >>> tree.add_decision("invest", ["stocks", "bonds"])
-    >>> tree.add_chance("stocks_market", ["bull", "bear"], [0.6, 0.4])
+    >>> tree.add_chance("stocks", ["bull", "bear"], [0.6, 0.4])
     >>> tree.set_payoff(("stocks", "bull"), 100)
     >>> tree.set_payoff(("stocks", "bear"), -50)
     >>> tree.set_payoff(("bonds",), 30)
@@ -224,7 +224,6 @@ class DecisionTree:
         # Use naming convention: look for nodes whose name starts with edge
         for node in self._nodes:
             if node.name.startswith(edge + "_") or node.name.endswith("_" + edge):
-                # Verify it hasn't been used already differently
                 return node
 
         return None
@@ -312,7 +311,7 @@ class DecisionTree:
             for edge, child in children.items():
                 values[edge] = self._solve_subtree(
                     child, utility_fn, strategy, pruned)
-            # Pick the choice that maximises expected utility
+            # Pick the choice that maximizes expected utility
             best_edge = max(values, key=lambda e: utility_fn(values[e]))
             strategy[node.name] = best_edge
             # Record pruned edges
@@ -353,7 +352,9 @@ class DecisionTree:
         """
         # Quick check for linear utility
         vals = list(child_values.values())
-        lo, hi = min(vals) - abs(min(vals)) - 1, max(vals) + abs(max(vals)) + 1
+        v_min, v_max = min(vals), max(vals)
+        lo = v_min - abs(v_min) - 1
+        hi = v_max + abs(v_max) + 1
 
         # Expand range to ensure we bracket
         for _ in range(20):
