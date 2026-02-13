@@ -74,8 +74,10 @@ class SimulationResults:
         """
         if ax is None:
             _, ax = plt.subplots()
-        ax.hist(self._samples, bins=bins, density=True, alpha=0.7,
-                edgecolor="black")
+        ax.hist(
+            self._samples, bins=bins, density=True, alpha=0.7,
+            edgecolor="black",
+        )
         ax.set_xlabel("Value")
         ax.set_ylabel("Density")
         ax.set_title("Simulation Results")
@@ -149,9 +151,7 @@ class MonteCarloSimulation:
 
         if self.n_workers <= 1:
             # Single-process: use vectorised loop with seed control
-            np.random.seed(
-                rng.integers(0, 2**31) if self.seed is not None else None
-            )
+            np.random.seed(rng.integers(0, 2**31))
             samples = np.array(
                 [self.func() for _ in range(self.n_samples)],
                 dtype=np.float64,
