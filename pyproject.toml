@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "probflow"
+version = "0.1.0"
+description = "ProbFlow: Python DSL for probabilistic programming"
+requires-python = ">=3.9"
+dependencies = [
+    "scipy>=1.10",
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
