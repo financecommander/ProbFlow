@@ -1,0 +1,56 @@
+name: Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[benchmark]"
+
+      - name: Run benchmarks
+        run: |
+          pytest probflow/benchmarks/suite.py \
+            --benchmark-only \
+            --benchmark-autosave \
+            --benchmark-json=benchmark_results.json
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: |
+            benchmark_results.json
+            .benchmarks/
+
+      - name: Check for regression
+        if: github.event_name == 'pull_request'
+        run: |
+          # Compare against saved baseline if available
+          if ls .benchmarks/*/*.json 1>/dev/null 2>&1; then
+            pytest probflow/benchmarks/suite.py \
+              --benchmark-only \
+              --benchmark-compare \
+              --benchmark-compare-fail=mean:10%
+          else
+            echo "No baseline benchmarks found, skipping regression check"
+          fi
