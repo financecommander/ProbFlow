@@ -75,7 +75,6 @@ class Dist(ABC):
         Returns:
             A new distribution representing the sum.
         """
-        from .operations import SumDist
         return SumDist(self, other)
     
     def __mul__(self, other: 'Dist') -> 'Dist':
@@ -87,7 +86,6 @@ class Dist(ABC):
         Returns:
             A new distribution representing the product.
         """
-        from .operations import ProductDist
         return ProductDist(self, other)
     
     def __and__(self, other: 'Dist') -> 'Dist':
@@ -99,7 +97,6 @@ class Dist(ABC):
         Returns:
             A new distribution representing the joint distribution.
         """
-        from .operations import JointDist
         return JointDist(self, other)
 
 
