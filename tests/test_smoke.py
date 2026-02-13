@@ -12,7 +12,7 @@ class TestImport:
         """Test importing the probflow package."""
         import probflow
 
-        assert probflow is not None
+        assert hasattr(probflow, "__version__")
 
     def test_version_exists(self) -> None:
         """Test that __version__ is defined."""
