@@ -76,6 +76,12 @@ def load_model(
 
     Validates DAG acyclicity and probability constraints on load.
 
+    .. warning::
+
+        Model files that use pickle encoding (for callable CPDs)
+        can execute arbitrary code on load.  Only load model files
+        from trusted sources.
+
     Parameters
     ----------
     filepath : str or Path
@@ -341,6 +347,13 @@ def _pickle_to_base64(obj: Any) -> str:
 
 
 def _base64_to_unpickle(b64: str) -> Any:
-    """Decode a base64 string and unpickle the result."""
+    """Decode a base64 string and unpickle the result.
+
+    .. warning::
+
+        Unpickling data can execute arbitrary code.  Only load model
+        files from trusted sources.  Do **not** load models downloaded
+        from untrusted or unverified origins.
+    """
     raw = base64.b64decode(b64.encode("ascii"))
     return pickle.loads(raw)  # noqa: S301

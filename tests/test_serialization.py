@@ -269,8 +269,9 @@ class TestErrorHandling:
 
     def test_file_not_found(self) -> None:
         """Loading a non-existent file raises FileNotFoundError."""
+        path = os.path.join(tempfile.gettempdir(), "nonexistent_model_12345.json")
         with pytest.raises(FileNotFoundError):
-            load_model("/tmp/nonexistent_model_12345.json")
+            load_model(path)
 
     def test_corrupted_json(self) -> None:
         """Loading a file with invalid JSON raises ValueError."""
