@@ -167,7 +167,7 @@ class TestHiddenMarkovModel:
             states_seq[t] = np.random.choice(2, p=true_trans[states_seq[t - 1]])
             obs_seq.append(obs[np.random.choice(3, p=true_emit[states_seq[t]])])
 
-        # Fit model from uniform initialisation
+        # Fit model from uniform initialization
         hmm = HiddenMarkovModel(hidden, obs)
         hmm.fit(obs_seq, max_iter=100)
 

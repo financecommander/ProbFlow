@@ -103,11 +103,11 @@ class HiddenMarkovModel:
         List of observable symbol labels.
     transition_probs : array-like, optional
         Row-stochastic transition matrix for hidden states.  If ``None``,
-        initialised uniformly.
+        initialized uniformly.
     emission_probs : array-like, optional
         Emission probability matrix of shape ``(n_hidden, n_obs)`` where
         ``emission_probs[i][j]`` is the probability of emitting observable
-        *j* when in hidden state *i*.  If ``None``, initialised uniformly.
+        *j* when in hidden state *i*.  If ``None``, initialized uniformly.
     initial_probs : array-like, optional
         Initial hidden-state distribution.  Defaults to uniform.
     """
