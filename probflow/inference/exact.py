@@ -10,7 +10,7 @@ Provides:
   using the elimination algorithm.
 
 Both functions accept *query* and *evidence* arguments and return a
-normalised probability table over the query variable(s).
+normalized probability table over the query variable(s).
 
 If the graph contains undirected loops, :func:`belief_propagation`
 raises a :class:`ValueError`; callers should fall back to
@@ -110,7 +110,7 @@ class FactorTable:
         return FactorTable(combined_vars, combined_cards, a * b)
 
     def marginalize(self, var: str) -> "FactorTable":
-        """Sum out (marginalise) *var* from this factor.
+        """Sum out (marginalize) *var* from this factor.
 
         Returns a new :class:`FactorTable` with one fewer dimension.
         """
@@ -140,7 +140,7 @@ class FactorTable:
         return FactorTable(new_vars, new_cards, np.asarray(new_values))
 
     def normalize(self) -> "FactorTable":
-        """Return a copy normalised so that all entries sum to 1."""
+        """Return a copy normalized so that all entries sum to 1."""
         total = self.values.sum()
         if total > 0:
             return FactorTable(
@@ -193,8 +193,8 @@ class FactorTable:
 def _has_undirected_cycle(nodes: List[Node]) -> bool:
     """Return True if the *undirected* skeleton of the DAG has a cycle.
 
-    A tree with *n* nodes has exactly *n − 1* edges.  If the undirected
-    edge count is ≥ *n*, the graph contains a cycle.
+    A tree with *n* nodes has exactly *n - 1* edges.  If the undirected
+    edge count is >= *n*, the graph contains a cycle.
     """
     edges: Set[Tuple[str, str]] = set()
     for node in nodes:

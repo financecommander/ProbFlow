@@ -140,7 +140,7 @@ class TestFactorTable:
         np.testing.assert_allclose(m.values, [1.0, 1.0])
 
     def test_marginalize_missing_variable(self):
-        """ValueError when marginalising a variable not in the factor."""
+        """ValueError when marginalizing a variable not in the factor."""
         f = FactorTable(["A"], [2], np.array([0.5, 0.5]))
         with pytest.raises(ValueError, match="not in factor"):
             f.marginalize("Z")
@@ -160,14 +160,14 @@ class TestFactorTable:
             f.reduce("Z", 0)
 
     def test_normalize(self):
-        """Normalise a factor so entries sum to 1."""
+        """Normalize a factor so entries sum to 1."""
         f = FactorTable(["A"], [3], np.array([2.0, 3.0, 5.0]))
         n = f.normalize()
         np.testing.assert_allclose(n.values, [0.2, 0.3, 0.5])
         assert abs(n.values.sum() - 1.0) < 1e-10
 
     def test_normalize_zero(self):
-        """Normalising an all-zero factor returns all zeros."""
+        """Normalizing an all-zero factor returns all zeros."""
         f = FactorTable(["A"], [2], np.array([0.0, 0.0]))
         n = f.normalize()
         np.testing.assert_allclose(n.values, [0.0, 0.0])
