@@ -146,12 +146,11 @@ class TestInferenceAccuracy:
         cpt = np.ones((6, 6)) / 6
         die1.add_child(die2, cpt)
 
-        rng = np.random.default_rng(42)
         n_samples = 100_000
         samples = forward_sample(die1, [die1, die2], n_samples, seed=42)
 
-        # Compute empirical sum distribution
-        sums = samples[:, 0] + samples[:, 1] + 2  # +2 because states are 0-indexed
+        # Convert 0-indexed states (0-5) to die values (1-6), then sum both dice
+        sums = (samples[:, 0] + 1) + (samples[:, 1] + 1)
         empirical = np.zeros(13)
         for k in range(2, 13):
             empirical[k] = np.sum(sums == k) / n_samples
