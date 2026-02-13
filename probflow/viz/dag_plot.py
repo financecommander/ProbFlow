@@ -26,8 +26,14 @@ import graphviz
 # ---------------------------------------------------------------------------
 
 def _node_id(name: str) -> str:
-    """Return a sanitised Graphviz node identifier."""
-    return name.replace(" ", "_").replace("-", "_")
+    """Return a sanitised Graphviz node identifier.
+
+    Replaces characters that are invalid in unquoted DOT identifiers
+    (spaces, hyphens, dots, colons, and other non-alphanumeric characters)
+    with underscores.
+    """
+    import re
+    return re.sub(r"[^A-Za-z0-9_]", "_", name)
 
 
 # ---------------------------------------------------------------------------
@@ -265,9 +271,7 @@ def plot_network(
         # graphviz.render writes <filename>.png or <filename>.svg
         # We strip the extension for the filename argument because
         # graphviz appends the format extension automatically.
-        base = output
-        if output.endswith(f".{render_format}"):
-            base = output[: -len(render_format) - 1]
+        base, _ = os.path.splitext(output)
         dot.render(filename=base, cleanup=True)
 
     return dot
