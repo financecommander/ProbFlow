@@ -62,6 +62,8 @@ def sensitivity_analysis(network, target, parameters, perturbation=0.1):
         raise TypeError("network must be callable")
     if not parameters:
         raise ValueError("parameters must be a non-empty dict")
+    if perturbation <= 0:
+        raise ValueError("perturbation must be positive")
 
     sensitivities = {}
 

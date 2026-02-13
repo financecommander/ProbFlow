@@ -185,3 +185,7 @@ class TestErrorHandling:
 
         with pytest.raises(KeyError, match="not_a_target"):
             sensitivity_analysis(simple, "not_a_target", {"a": 1.0})
+
+    def test_zero_perturbation(self):
+        with pytest.raises(ValueError, match="positive"):
+            sensitivity_analysis(_linear_network, "y", {"a": 1.0, "b": 1.0, "c": 1.0}, perturbation=0.0)
