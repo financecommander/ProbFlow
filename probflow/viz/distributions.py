@@ -29,7 +29,7 @@ COLORBLIND_SAFE_PALETTE: List[str] = [
 
 
 def _get_color(index: int) -> str:
-    """Return a colour from the colorblind-safe palette (wraps around)."""
+    """Return a color from the colorblind-safe palette (wraps around)."""
     return COLORBLIND_SAFE_PALETTE[index % len(COLORBLIND_SAFE_PALETTE)]
 
 
