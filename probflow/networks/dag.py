@@ -18,7 +18,7 @@ Inference methods:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 import networkx as nx
 import numpy as np
@@ -175,7 +175,7 @@ class BeliefNetwork:
     #  Internal: build Node objects for the inference engine
     # ------------------------------------------------------------------ #
 
-    def _build_nodes(self) -> tuple[Node, list[Node]]:
+    def _build_nodes(self) -> Tuple[Node, List[Node]]:
         """Convert the networkx graph into :class:`Node` objects.
 
         Returns ``(root, nodes)`` where *root* is the first
@@ -327,7 +327,7 @@ class BeliefNetwork:
         return list(nx.topological_sort(self._graph))
 
     @property
-    def edges(self) -> List[tuple[str, str]]:
+    def edges(self) -> List[Tuple[str, str]]:
         """Return directed edges as (parent, child) tuples."""
         return list(self._graph.edges())
 
