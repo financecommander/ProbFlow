@@ -54,7 +54,10 @@
       "Bash(git merge origin/copilot/implement-decision-tree-class -m \"Merge decision-tree\")",
       "Bash(git checkout origin/copilot/implement-decision-tree-class -- probflow/decision/__init__.py probflow/decision/tree.py tests/test_decision_tree.py)",
       "Bash(git merge origin/copilot/implement-uncertainty-aware-agent -m \"Merge uncertainty-agent\")",
-      "Bash(git checkout origin/copilot/implement-uncertainty-aware-agent -- probflow/integration/__init__.py probflow/integration/orchestra_agent.py tests/test_orchestra_agent.py)"
+      "Bash(git checkout origin/copilot/implement-uncertainty-aware-agent -- probflow/integration/__init__.py probflow/integration/orchestra_agent.py tests/test_orchestra_agent.py)",
+      "Bash(git merge origin/copilot/implement-triton-bridge-functionality -m \"Merge triton-bridge\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/distributions/__init__.py probflow/distributions/discrete.py probflow/integration/__init__.py)",
+      "Bash(git checkout origin/copilot/implement-triton-bridge-functionality -- probflow/integration/triton_bridge.py tests/test_triton_bridge.py)"
     ]
   }
 }
