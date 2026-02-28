@@ -47,7 +47,10 @@
       "Bash(git checkout origin/copilot/implement-monte-carlo-simulation -- probflow/inference/sampling.py tests/test_sampling.py)",
       "Bash(git merge origin/copilot/add-mcmc-sampler-class -m \"Merge mcmc\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/__init__.py probflow/distributions/__init__.py probflow/distributions/continuous.py probflow/distributions/discrete.py probflow/inference/__init__.py probflow/inference/belief_network.py)",
-      "Bash(git checkout origin/copilot/add-mcmc-sampler-class -- probflow/inference/mcmc.py tests/test_mcmc.py)"
+      "Bash(git checkout origin/copilot/add-mcmc-sampler-class -- probflow/inference/mcmc.py tests/test_mcmc.py)",
+      "Bash(git merge origin/copilot/add-markov-chain-implementation -m \"Merge markov-chain\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py)",
+      "Bash(git checkout origin/copilot/add-markov-chain-implementation -- probflow/temporal/__init__.py probflow/temporal/markov.py tests/test_markov.py)"
     ]
   }
 }
