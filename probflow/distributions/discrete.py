@@ -150,9 +150,12 @@ class Categorical(Dist):
     ----------
     probs : array-like
         Probabilities for each category. Must be non-negative and sum to 1.
+    labels : list of str, optional
+        Human-readable labels for each category. If provided, samples
+        return label strings instead of integer indices.
     """
 
-    def __init__(self, probs):
+    def __init__(self, probs, labels=None):
         probs = np.asarray(probs, dtype=float)
         if np.any(probs < 0):
             raise ValueError("All probabilities must be non-negative.")
@@ -162,13 +165,30 @@ class Categorical(Dist):
             )
         self.probs = probs
         self._k = len(probs)
+        self.labels = list(labels) if labels is not None else None
+        if self.labels is not None and len(self.labels) != self._k:
+            raise ValueError("Number of labels must match number of probabilities")
 
     def sample(self, n=1):
-        """Draw n random samples from the distribution."""
-        return np.random.choice(self._k, size=n, p=self.probs)
+        """Draw n random samples from the distribution.
+
+        Returns label strings if labels were provided, otherwise integers.
+        """
+        indices = np.random.choice(self._k, size=n, p=self.probs)
+        if self.labels is not None:
+            return np.array([self.labels[i] for i in indices])
+        return indices
 
     def pmf(self, x):
         """Probability mass function evaluated at x."""
+        if self.labels is not None:
+            label_to_idx = {label: i for i, label in enumerate(self.labels)}
+            x_arr = np.atleast_1d(x)
+            result = np.array([
+                self.probs[label_to_idx[v]] if v in label_to_idx else 0.0
+                for v in x_arr
+            ])
+            return float(result[0]) if np.ndim(x) == 0 or isinstance(x, str) else result
         x = np.asarray(x, dtype=int)
         in_range = (x >= 0) & (x < self._k)
         safe_x = np.where(in_range, x, 0)
@@ -212,8 +232,11 @@ class Categorical(Dist):
         return np.array([_scalar_quantile(p) for p in q.flat]).reshape(q.shape)
 
     def mode(self):
-        """Return the mode (most probable category index)."""
-        return int(np.argmax(self.probs))
+        """Return the most probable category."""
+        idx = int(np.argmax(self.probs))
+        if self.labels is not None:
+            return self.labels[idx]
+        return idx
 
     def __repr__(self):
         return f"Categorical(probs={self.probs})"

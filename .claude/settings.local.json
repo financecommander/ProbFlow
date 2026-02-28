@@ -28,7 +28,10 @@
       "Bash(git add -A)",
       "Bash(git merge origin/copilot/implement-discrete-distributions -m \"Merge discrete distributions\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/distributions/__init__.py)",
-      "Bash(git checkout origin/copilot/implement-discrete-distributions -- tests/test_discrete.py)"
+      "Bash(git checkout origin/copilot/implement-discrete-distributions -- tests/test_discrete.py)",
+      "Bash(git merge origin/copilot/add-conditional-distribution-class -m \"Merge conditional distribution\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/__init__.py probflow/distributions/__init__.py probflow/distributions/continuous.py)",
+      "Bash(git checkout origin/copilot/add-conditional-distribution-class -- probflow/distributions/conditional.py probflow/inference/__init__.py probflow/inference/belief_network.py tests/test_conditional.py)"
     ]
   }
 }
