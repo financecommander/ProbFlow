@@ -4,6 +4,8 @@ import importlib
 import subprocess
 import sys
 
+import pytest
+
 
 class TestImport:
     """Test that probflow can be imported."""
@@ -33,6 +35,13 @@ class TestImport:
 class TestCLISmoke:
     """CLI smoke tests for the probflow package."""
 
+    @pytest.mark.skipif(
+        subprocess.run(
+            [sys.executable, "-m", "pip", "show", "probflow"],
+            capture_output=True,
+        ).returncode != 0,
+        reason="probflow not installed via pip (run 'pip install -e .')",
+    )
     def test_pip_show(self) -> None:
         """Test that pip show probflow succeeds."""
         result = subprocess.run(

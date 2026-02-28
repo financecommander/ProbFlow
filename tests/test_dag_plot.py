@@ -1,11 +1,15 @@
 """Tests for probflow.viz.dag_plot module."""
 
 import os
+import shutil
 import tempfile
 
 import pytest
 
 from probflow.viz.dag_plot import plot_network, _longest_path, _critical_edges
+
+_HAS_DOT = shutil.which("dot") is not None
+_skip_no_dot = pytest.mark.skipif(not _HAS_DOT, reason="Graphviz 'dot' binary not on PATH")
 
 
 # -----------------------------------------------------------------------
@@ -67,6 +71,7 @@ def _diamond_network():
 # -----------------------------------------------------------------------
 
 class TestExportFormats:
+    @_skip_no_dot
     def test_export_png(self, tmp_path):
         """plot_network should produce a valid PNG file."""
         outfile = str(tmp_path / "test_graph.png")
@@ -77,6 +82,7 @@ class TestExportFormats:
             header = f.read(4)
         assert header[:4] == b"\x89PNG"
 
+    @_skip_no_dot
     def test_export_svg(self, tmp_path):
         """plot_network should produce a valid SVG file."""
         outfile = str(tmp_path / "test_graph.svg")
@@ -270,6 +276,7 @@ class TestLayoutQuality:
         dot = plot_network(net, output=str(tmp_path / "g.dot"))
         assert dot.engine == "dot"
 
+    @_skip_no_dot
     def test_png_renders_without_overlap(self, tmp_path):
         """A moderately complex graph should render to a PNG without error."""
         # Build a larger network
@@ -305,6 +312,7 @@ class TestLegend:
         assert "Query" in src
         assert "Latent" in src
 
+    @_skip_no_dot
     def test_legend_in_rendered_output(self, tmp_path):
         """Legend should be present in rendered SVG output."""
         outfile = str(tmp_path / "legend.svg")
