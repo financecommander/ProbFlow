@@ -38,7 +38,10 @@
       "Bash(git checkout origin/copilot/implement-belief-network-class -- probflow/networks/__init__.py probflow/networks/dag.py probflow/networks/graph.py probflow/inference/exact.py tests/test_dag.py)",
       "Bash(git merge origin/copilot/implement-inference-methods -m \"Merge inference-methods\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/types.py probflow/inference/__init__.py)",
-      "Bash(git checkout origin/copilot/implement-inference-methods -- tests/test_exact.py probflow/benchmarks/__init__.py)"
+      "Bash(git checkout origin/copilot/implement-inference-methods -- tests/test_exact.py probflow/benchmarks/__init__.py)",
+      "Bash(git merge origin/copilot/implement-causal-dag -m \"Merge causal-dag\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/__init__.py probflow/core/types.py probflow/distributions/__init__.py probflow/distributions/continuous.py probflow/distributions/discrete.py probflow/inference/__init__.py)",
+      "Bash(git checkout origin/copilot/implement-causal-dag -- probflow/causal/__init__.py probflow/causal/dag.py tests/test_causal_dag.py)"
     ]
   }
 }
