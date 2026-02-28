@@ -63,7 +63,10 @@
       "Bash(git checkout origin/copilot/add-distribution-visualization -- probflow/viz/__init__.py probflow/viz/distributions.py tests/test_viz_distributions.py)",
       "Bash(git merge origin/copilot/add-dag-plot-functionality -m \"Merge dag-plot\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/viz/__init__.py)",
-      "Bash(git checkout origin/copilot/add-dag-plot-functionality -- probflow/viz/dag_plot.py tests/test_dag_plot.py)"
+      "Bash(git checkout origin/copilot/add-dag-plot-functionality -- probflow/viz/dag_plot.py tests/test_dag_plot.py)",
+      "Bash(git merge origin/copilot/add-model-serialization-functions -m \"Merge serialization-v1\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/__init__.py probflow/core/types.py probflow/inference/__init__.py probflow/inference/exact.py probflow/integration/__init__.py)",
+      "Bash(git checkout origin/copilot/add-model-serialization-functions -- probflow/integration/serialization.py tests/test_serialization.py)"
     ]
   }
 }
