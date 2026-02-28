@@ -35,7 +35,10 @@
       "Bash(python -c \"from probflow.distributions.conditional import ConditionalDist; from probflow.inference.belief_network import BeliefNetwork; print\\(''Phase 2 OK''\\)\")",
       "Bash(git merge origin/copilot/implement-belief-network-class -m \"Merge belief-network-class\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/inference/__init__.py)",
-      "Bash(git checkout origin/copilot/implement-belief-network-class -- probflow/networks/__init__.py probflow/networks/dag.py probflow/networks/graph.py probflow/inference/exact.py tests/test_dag.py)"
+      "Bash(git checkout origin/copilot/implement-belief-network-class -- probflow/networks/__init__.py probflow/networks/dag.py probflow/networks/graph.py probflow/inference/exact.py tests/test_dag.py)",
+      "Bash(git merge origin/copilot/implement-inference-methods -m \"Merge inference-methods\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/types.py probflow/inference/__init__.py)",
+      "Bash(git checkout origin/copilot/implement-inference-methods -- tests/test_exact.py probflow/benchmarks/__init__.py)"
     ]
   }
 }
