@@ -57,7 +57,10 @@
       "Bash(git checkout origin/copilot/implement-uncertainty-aware-agent -- probflow/integration/__init__.py probflow/integration/orchestra_agent.py tests/test_orchestra_agent.py)",
       "Bash(git merge origin/copilot/implement-triton-bridge-functionality -m \"Merge triton-bridge\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/distributions/__init__.py probflow/distributions/discrete.py probflow/integration/__init__.py)",
-      "Bash(git checkout origin/copilot/implement-triton-bridge-functionality -- probflow/integration/triton_bridge.py tests/test_triton_bridge.py)"
+      "Bash(git checkout origin/copilot/implement-triton-bridge-functionality -- probflow/integration/triton_bridge.py tests/test_triton_bridge.py)",
+      "Bash(git merge origin/copilot/add-distribution-visualization -m \"Merge distribution-viz\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/distributions/__init__.py probflow/distributions/continuous.py)",
+      "Bash(git checkout origin/copilot/add-distribution-visualization -- probflow/viz/__init__.py probflow/viz/distributions.py tests/test_viz_distributions.py)"
     ]
   }
 }
