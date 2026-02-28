@@ -72,7 +72,10 @@
       "Bash(git checkout origin/copilot/add-sensitivity-analysis-function -- probflow/inference/sensitivity.py tests/test_sensitivity.py)",
       "Bash(git merge origin/copilot/add-benchmark-tests -m \"Merge benchmarks\")",
       "Bash(git checkout --ours .github/workflows/benchmarks.yml .gitignore pyproject.toml probflow/__init__.py probflow/core/types.py)",
-      "Bash(git checkout origin/copilot/add-benchmark-tests -- probflow/benchmarks/suite.py probflow/inference/belief_propagation.py probflow/inference/monte_carlo.py)"
+      "Bash(git checkout origin/copilot/add-benchmark-tests -- probflow/benchmarks/suite.py probflow/inference/belief_propagation.py probflow/inference/monte_carlo.py)",
+      "Bash(git merge origin/copilot/setup-sphinx-autodoc-probflow -m \"Merge sphinx docs\")",
+      "Bash(git checkout --ours .github/workflows/docs.yml .gitignore pyproject.toml probflow/__init__.py probflow/core/__init__.py probflow/core/context.py probflow/core/types.py probflow/distributions/__init__.py probflow/distributions/continuous.py probflow/distributions/discrete.py requirements.txt)",
+      "Bash(git checkout origin/copilot/setup-sphinx-autodoc-probflow -- docs/)"
     ]
   }
 }
