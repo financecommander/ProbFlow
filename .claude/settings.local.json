@@ -50,7 +50,9 @@
       "Bash(git checkout origin/copilot/add-mcmc-sampler-class -- probflow/inference/mcmc.py tests/test_mcmc.py)",
       "Bash(git merge origin/copilot/add-markov-chain-implementation -m \"Merge markov-chain\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py)",
-      "Bash(git checkout origin/copilot/add-markov-chain-implementation -- probflow/temporal/__init__.py probflow/temporal/markov.py tests/test_markov.py)"
+      "Bash(git checkout origin/copilot/add-markov-chain-implementation -- probflow/temporal/__init__.py probflow/temporal/markov.py tests/test_markov.py)",
+      "Bash(git merge origin/copilot/implement-decision-tree-class -m \"Merge decision-tree\")",
+      "Bash(git checkout origin/copilot/implement-decision-tree-class -- probflow/decision/__init__.py probflow/decision/tree.py tests/test_decision_tree.py)"
     ]
   }
 }
