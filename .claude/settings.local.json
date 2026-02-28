@@ -41,7 +41,10 @@
       "Bash(git checkout origin/copilot/implement-inference-methods -- tests/test_exact.py probflow/benchmarks/__init__.py)",
       "Bash(git merge origin/copilot/implement-causal-dag -m \"Merge causal-dag\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/core/__init__.py probflow/core/types.py probflow/distributions/__init__.py probflow/distributions/continuous.py probflow/distributions/discrete.py probflow/inference/__init__.py)",
-      "Bash(git checkout origin/copilot/implement-causal-dag -- probflow/causal/__init__.py probflow/causal/dag.py tests/test_causal_dag.py)"
+      "Bash(git checkout origin/copilot/implement-causal-dag -- probflow/causal/__init__.py probflow/causal/dag.py tests/test_causal_dag.py)",
+      "Bash(python -c \"from probflow.causal.dag import CausalDAG; from probflow.networks.dag import BeliefNetwork; from probflow.inference.exact import belief_propagation; print\\(''Phase 3 OK''\\)\")",
+      "Bash(git merge origin/copilot/implement-monte-carlo-simulation -m \"Merge monte-carlo\")",
+      "Bash(git checkout origin/copilot/implement-monte-carlo-simulation -- probflow/inference/sampling.py tests/test_sampling.py)"
     ]
   }
 }
