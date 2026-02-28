@@ -1,231 +1,219 @@
 """Discrete probability distributions."""
 
 from typing import Union
+
 import numpy as np
 from scipy import stats
+
 from ..core.types import Dist
 
 
-class Bernoulli(Dist):
-    """Bernoulli distribution.
-    
-    The Bernoulli distribution models a single trial with two possible outcomes:
-    success (1) with probability p, or failure (0) with probability 1-p.
-    
-    Args:
-        p: Probability of success (default: 0.5).
-        
-    Example:
-        >>> bern = Bernoulli(0.7)
-        >>> samples = bern.sample(1000)
+def probability(distribution, threshold, comparison="gt"):
+    """Compute the probability of a distribution exceeding or falling below a threshold.
+
+    Parameters
+    ----------
+    distribution : Bernoulli, Poisson, or Categorical
+        A discrete distribution instance.
+    threshold : float or int
+        The threshold value.
+    comparison : str
+        One of "gt" (P(X > threshold)), "ge" (P(X >= threshold)),
+        "lt" (P(X < threshold)), "le" (P(X <= threshold)),
+        or "eq" (P(X == threshold)).
+
+    Returns
+    -------
+    float
+        The computed probability.
     """
-    
-    def __init__(self, p: float = 0.5):
-        """Initialize Bernoulli distribution.
-        
-        Args:
-            p: Probability of success.
-            
-        Raises:
-            ValueError: If p is not in [0, 1].
-        """
-        if not (0 <= p <= 1):
-            raise ValueError("p must be in [0, 1]")
-        self.p = p
-        self._dist = stats.bernoulli(p=p)
-    
-    def sample(self, n: int) -> np.ndarray:
-        """Draw random samples from the Bernoulli distribution.
-        
-        Args:
-            n: Number of samples to draw.
-            
-        Returns:
-            Array of shape (n,) containing 0s and 1s.
-        """
+    if comparison == "gt":
+        return 1.0 - distribution.cdf(threshold)
+    elif comparison == "ge":
+        return 1.0 - distribution.cdf(threshold - 1)
+    elif comparison == "lt":
+        return distribution.cdf(threshold - 1)
+    elif comparison == "le":
+        return distribution.cdf(threshold)
+    elif comparison == "eq":
+        return distribution.pmf(threshold)
+    else:
+        raise ValueError(
+            f"Unknown comparison '{comparison}'. Use 'gt', 'ge', 'lt', 'le', or 'eq'."
+        )
+
+
+class Bernoulli(Dist):
+    """Bernoulli distribution for binary outcomes.
+
+    Parameters
+    ----------
+    p : float
+        Probability of success (1), must be in [0, 1].
+    """
+
+    def __init__(self, p=0.5):
+        if not 0 <= p <= 1:
+            raise ValueError(f"p must be in [0, 1], got {p}")
+        self.p = float(p)
+        self._dist = stats.bernoulli(self.p)
+
+    def sample(self, n=1):
+        """Draw n random samples from the distribution."""
         return self._dist.rvs(size=n)
-    
-    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the probability mass function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the PMF (should be 0 or 1).
-            
-        Returns:
-            Probability mass at x.
-        """
+
+    def pmf(self, x):
+        """Probability mass function evaluated at x."""
         return self._dist.pmf(x)
-    
+
+    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """Alias for pmf() to satisfy Dist ABC interface."""
+        return self.pmf(x)
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the cumulative distribution function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the CDF.
-            
-        Returns:
-            Cumulative probability at x.
-        """
+        """Cumulative distribution function evaluated at x."""
         return self._dist.cdf(x)
-    
+
     def quantile(self, q: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the quantile function (inverse CDF) at q.
-        
-        Args:
-            q: Probability value(s) in [0, 1] at which to compute quantiles.
-            
-        Returns:
-            Quantile value(s) corresponding to q.
-        """
+        """Quantile function (inverse CDF) at q."""
         return self._dist.ppf(q)
+
+    def mode(self):
+        """Return the mode of the distribution."""
+        if self.p >= 0.5:
+            return 1
+        return 0
+
+    def __and__(self, other):
+        """Joint probability assuming independence: P(A & B) = P(A) * P(B)."""
+        if not isinstance(other, Bernoulli):
+            return NotImplemented
+        return Bernoulli(self.p * other.p)
+
+    def __or__(self, other):
+        """Union probability assuming independence: P(A or B) = P(A) + P(B) - P(A)*P(B)."""
+        if not isinstance(other, Bernoulli):
+            return NotImplemented
+        return Bernoulli(self.p + other.p - self.p * other.p)
+
+    def __repr__(self):
+        return f"Bernoulli(p={self.p})"
 
 
 class Poisson(Dist):
-    """Poisson distribution.
-    
-    The Poisson distribution models the number of events occurring in a fixed
-    interval of time or space, given a constant mean rate.
-    
-    Args:
-        lam: Expected number of events (rate parameter, default: 1.0).
-        
-    Example:
-        >>> poisson = Poisson(3.5)
-        >>> samples = poisson.sample(1000)
+    """Poisson distribution for count data.
+
+    Parameters
+    ----------
+    lambda_ : float
+        Rate parameter (mean), must be > 0.
     """
-    
-    def __init__(self, lam: float = 1.0):
-        """Initialize Poisson distribution.
-        
-        Args:
-            lam: Rate parameter (expected number of events).
-            
-        Raises:
-            ValueError: If lam <= 0.
-        """
-        if lam <= 0:
-            raise ValueError("lam must be positive")
-        self.lam = lam
-        self._dist = stats.poisson(mu=lam)
-    
-    def sample(self, n: int) -> np.ndarray:
-        """Draw random samples from the Poisson distribution.
-        
-        Args:
-            n: Number of samples to draw.
-            
-        Returns:
-            Array of shape (n,) containing non-negative integers.
-        """
+
+    def __init__(self, lambda_=1.0):
+        if lambda_ <= 0:
+            raise ValueError(f"lambda_ must be > 0, got {lambda_}")
+        self.lambda_ = float(lambda_)
+        self._dist = stats.poisson(self.lambda_)
+
+    def sample(self, n=1):
+        """Draw n random samples from the distribution."""
         return self._dist.rvs(size=n)
-    
-    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the probability mass function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the PMF (should be non-negative integers).
-            
-        Returns:
-            Probability mass at x.
-        """
+
+    def pmf(self, x):
+        """Probability mass function evaluated at x."""
         return self._dist.pmf(x)
-    
+
+    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """Alias for pmf() to satisfy Dist ABC interface."""
+        return self.pmf(x)
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the cumulative distribution function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the CDF.
-            
-        Returns:
-            Cumulative probability at x.
-        """
+        """Cumulative distribution function evaluated at x."""
         return self._dist.cdf(x)
-    
+
     def quantile(self, q: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the quantile function (inverse CDF) at q.
-        
-        Args:
-            q: Probability value(s) in [0, 1] at which to compute quantiles.
-            
-        Returns:
-            Quantile value(s) corresponding to q.
-        """
+        """Quantile function (inverse CDF) at q."""
         return self._dist.ppf(q)
+
+    def mode(self):
+        """Return the mode of the distribution."""
+        return int(np.floor(self.lambda_))
+
+    def __repr__(self):
+        return f"Poisson(lambda_={self.lambda_})"
 
 
 class Categorical(Dist):
-    """Categorical distribution.
-    
-    The categorical distribution models a random variable that can take one of K
-    different values, each with a specific probability.
-    
-    Args:
-        probs: Array of probabilities for each category (must sum to 1).
-        
-    Example:
-        >>> cat = Categorical([0.2, 0.3, 0.5])
-        >>> samples = cat.sample(1000)
+    """Categorical distribution (multinomial with n=1).
+
+    Parameters
+    ----------
+    probs : array-like
+        Probabilities for each category. Must be non-negative and sum to 1.
     """
-    
-    def __init__(self, probs: Union[list, np.ndarray]):
-        """Initialize Categorical distribution.
-        
-        Args:
-            probs: Probabilities for each category.
-            
-        Raises:
-            ValueError: If probs don't sum to 1 or contain negative values.
-        """
-        probs = np.array(probs)
-        if not np.allclose(probs.sum(), 1.0):
-            raise ValueError("probabilities must sum to 1")
+
+    def __init__(self, probs):
+        probs = np.asarray(probs, dtype=float)
         if np.any(probs < 0):
-            raise ValueError("probabilities must be non-negative")
+            raise ValueError("All probabilities must be non-negative.")
+        if not np.isclose(probs.sum(), 1.0):
+            raise ValueError(
+                f"Probabilities must sum to 1, got {probs.sum()}"
+            )
         self.probs = probs
-        self.k = len(probs)
-        # scipy.stats doesn't have a direct categorical, but we can use rv_discrete
-        values = np.arange(self.k)
-        self._dist = stats.rv_discrete(values=(values, probs))
-    
-    def sample(self, n: int) -> np.ndarray:
-        """Draw random samples from the categorical distribution.
-        
-        Args:
-            n: Number of samples to draw.
-            
-        Returns:
-            Array of shape (n,) containing category indices (0 to k-1).
-        """
-        return self._dist.rvs(size=n)
-    
-    def pdf(self, x: Union[int, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the probability mass function at x.
-        
-        Args:
-            x: Category index/indices at which to evaluate the PMF.
-            
-        Returns:
-            Probability mass at x.
-        """
-        return self._dist.pmf(x)
-    
+        self._k = len(probs)
+
+    def sample(self, n=1):
+        """Draw n random samples from the distribution."""
+        return np.random.choice(self._k, size=n, p=self.probs)
+
+    def pmf(self, x):
+        """Probability mass function evaluated at x."""
+        x = np.asarray(x, dtype=int)
+        in_range = (x >= 0) & (x < self._k)
+        safe_x = np.where(in_range, x, 0)
+        result = np.where(in_range, self.probs[safe_x], 0.0)
+        return float(result) if result.ndim == 0 else result
+
+    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """Alias for pmf() to satisfy Dist ABC interface."""
+        return self.pmf(x)
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the cumulative distribution function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the CDF.
-            
-        Returns:
-            Cumulative probability at x.
-        """
-        return self._dist.cdf(x)
-    
+        """Cumulative distribution function evaluated at x."""
+        x = np.asarray(x)
+        cumprobs = np.cumsum(self.probs)
+
+        def _scalar_cdf(val):
+            if val < 0:
+                return 0.0
+            idx = int(np.floor(val))
+            if idx >= self._k:
+                return 1.0
+            return float(cumprobs[idx])
+
+        if x.ndim == 0:
+            return _scalar_cdf(x)
+        return np.array([_scalar_cdf(v) for v in x.flat]).reshape(x.shape)
+
     def quantile(self, q: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the quantile function (inverse CDF) at q.
-        
-        Args:
-            q: Probability value(s) in [0, 1] at which to compute quantiles.
-            
-        Returns:
-            Quantile value(s) corresponding to q.
-        """
-        return self._dist.ppf(q)
+        """Quantile function (inverse CDF) at q."""
+        q = np.asarray(q, dtype=float)
+        cumprobs = np.cumsum(self.probs)
+
+        def _scalar_quantile(prob):
+            for i, cp in enumerate(cumprobs):
+                if prob <= cp:
+                    return float(i)
+            return float(self._k - 1)
+
+        if q.ndim == 0:
+            return _scalar_quantile(float(q))
+        return np.array([_scalar_quantile(p) for p in q.flat]).reshape(q.shape)
+
+    def mode(self):
+        """Return the mode (most probable category index)."""
+        return int(np.argmax(self.probs))
+
+    def __repr__(self):
+        return f"Categorical(probs={self.probs})"

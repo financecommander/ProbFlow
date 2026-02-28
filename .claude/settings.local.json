@@ -25,7 +25,10 @@
       "Bash(git merge origin/copilot/add-continuous-distributions -m \"Merge copilot/add-continuous-distributions\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/distributions/__init__.py)",
       "Bash(git checkout origin/copilot/add-continuous-distributions -- tests/test_continuous.py)",
-      "Bash(git add -A)"
+      "Bash(git add -A)",
+      "Bash(git merge origin/copilot/implement-discrete-distributions -m \"Merge discrete distributions\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/__init__.py probflow/distributions/__init__.py)",
+      "Bash(git checkout origin/copilot/implement-discrete-distributions -- tests/test_discrete.py)"
     ]
   }
 }
