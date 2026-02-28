@@ -69,7 +69,10 @@
       "Bash(git checkout origin/copilot/add-model-serialization-functions -- probflow/integration/serialization.py tests/test_serialization.py)",
       "Bash(git merge origin/copilot/add-sensitivity-analysis-function -m \"Merge sensitivity\")",
       "Bash(git checkout --ours .gitignore pyproject.toml probflow/inference/__init__.py)",
-      "Bash(git checkout origin/copilot/add-sensitivity-analysis-function -- probflow/inference/sensitivity.py tests/test_sensitivity.py)"
+      "Bash(git checkout origin/copilot/add-sensitivity-analysis-function -- probflow/inference/sensitivity.py tests/test_sensitivity.py)",
+      "Bash(git merge origin/copilot/add-benchmark-tests -m \"Merge benchmarks\")",
+      "Bash(git checkout --ours .github/workflows/benchmarks.yml .gitignore pyproject.toml probflow/__init__.py probflow/core/types.py)",
+      "Bash(git checkout origin/copilot/add-benchmark-tests -- probflow/benchmarks/suite.py probflow/inference/belief_propagation.py probflow/inference/monte_carlo.py)"
     ]
   }
 }
