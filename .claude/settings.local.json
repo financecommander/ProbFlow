@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo view financecommander/ProbFlow --json description,name,primaryLanguage,defaultBranchRef)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone https://github.com/financecommander/ProbFlow.git .)",
+      "Bash(git checkout main)",
+      "Bash(git ls-tree origin/copilot/setup-python-package-infrastructure .gitignore)",
+      "Bash(git ls-tree origin/copilot/create-probflow-package .gitignore)",
+      "Bash(git ls-tree origin/copilot/implement-discrete-distributions .gitignore)",
+      "Bash(git ls-tree origin/copilot/add-continuous-distributions .gitignore)",
+      "Bash(git ls-tree -r origin/copilot/add-model-serialization-functions -- probflow/integration/serialization.py)",
+      "Bash(xargs git cat-file -p)",
+      "Bash(git ls-tree -r origin/copilot/create-probflow-package -- probflow/core/context.py)",
+      "Bash(git ls-tree -r origin/copilot/implement-belief-network-class -- probflow/networks/graph.py)",
+      "Bash(git ls-tree -r origin/copilot/implement-causal-dag -- probflow/causal/dag.py)",
+      "Bash(git ls-tree -r origin/copilot/implement-causal-dag -- probflow/core/types.py)",
+      "Bash(git ls-tree main README.md)",
+      "Bash(git merge origin/copilot/create-probflow-package --allow-unrelated-histories -m \"Merge copilot/create-probflow-package: core Dist ABC, context manager, initial distributions\")",
+      "Bash(git merge origin/copilot/setup-python-package-infrastructure -m \"Merge copilot/setup-python-package-infrastructure: pyproject.toml, CI, pre-commit\")",
+      "Bash(git add .gitignore probflow/__init__.py)",
+      "Bash(git commit:*)",
+      "Bash(python -c \"import probflow; print\\(probflow.__version__\\); print\\(''Imports OK''\\)\")",
+      "Bash(pip install numpy scipy networkx matplotlib)",
+      "Bash(git merge origin/copilot/add-continuous-distributions -m \"Merge copilot/add-continuous-distributions\")",
+      "Bash(git checkout --ours .gitignore pyproject.toml probflow/distributions/__init__.py)",
+      "Bash(git checkout origin/copilot/add-continuous-distributions -- tests/test_continuous.py)",
+      "Bash(git add -A)"
+    ]
+  }
+}

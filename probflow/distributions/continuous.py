@@ -1,235 +1,213 @@
-"""Continuous probability distributions."""
+"""Continuous probability distributions backed by scipy.stats."""
+
+from __future__ import annotations
 
 from typing import Union
+
 import numpy as np
 from scipy import stats
+
 from ..core.types import Dist
 
 
 class Normal(Dist):
-    """Normal (Gaussian) distribution.
-    
-    The normal distribution is characterized by its mean (loc) and 
-    standard deviation (scale).
-    
-    Args:
-        loc: Mean of the distribution (default: 0.0).
-        scale: Standard deviation of the distribution (default: 1.0).
-        
-    Example:
-        >>> norm = Normal(0, 1)
-        >>> samples = norm.sample(1000)
-        >>> prob = norm.pdf(0)
+    """Gaussian distribution parameterised by *mu* (mean) and *sigma* (std dev).
+
+    Supports closed-form convolution via ``+`` (sum of independent normals)
+    and affine scaling via ``*``.
     """
-    
-    def __init__(self, loc: float = 0.0, scale: float = 1.0):
-        """Initialize Normal distribution.
-        
-        Args:
-            loc: Mean of the distribution.
-            scale: Standard deviation of the distribution.
-            
-        Raises:
-            ValueError: If scale <= 0.
-        """
-        if scale <= 0:
-            raise ValueError("scale must be positive")
-        self.loc = loc
-        self.scale = scale
-        self._dist = stats.norm(loc=loc, scale=scale)
-    
-    def sample(self, n: int) -> np.ndarray:
-        """Draw random samples from the normal distribution.
-        
-        Args:
-            n: Number of samples to draw.
-            
-        Returns:
-            Array of shape (n,) containing random samples.
-        """
+
+    def __init__(self, mu: float = 0.0, sigma: float = 1.0) -> None:
+        if sigma < 0:
+            raise ValueError("sigma must be non-negative")
+        self.mu = float(mu)
+        self.sigma = float(sigma)
+        self._degenerate = self.sigma == 0.0
+        if not self._degenerate:
+            self._dist = stats.norm(loc=self.mu, scale=self.sigma)
+
+    # ---------- core API ----------
+
+    def sample(self, n: int = 1) -> np.ndarray:
+        if self._degenerate:
+            return np.full(n, self.mu)
         return self._dist.rvs(size=n)
-    
+
     def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the probability density function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the PDF.
-            
-        Returns:
-            Probability density at x.
-        """
+        if self._degenerate:
+            x = np.asarray(x, dtype=float)
+            return np.where(x == self.mu, np.inf, 0.0)
         return self._dist.pdf(x)
-    
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the cumulative distribution function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the CDF.
-            
-        Returns:
-            Cumulative probability at x.
-        """
+        if self._degenerate:
+            x = np.asarray(x, dtype=float)
+            return np.where(x >= self.mu, 1.0, 0.0)
         return self._dist.cdf(x)
-    
+
     def quantile(self, q: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the quantile function (inverse CDF) at q.
-        
-        Args:
-            q: Probability value(s) in [0, 1] at which to compute quantiles.
-            
-        Returns:
-            Quantile value(s) corresponding to q.
-        """
+        if self._degenerate:
+            return np.full_like(np.asarray(q, dtype=float), self.mu)
         return self._dist.ppf(q)
+
+    def mean(self) -> float:
+        return self.mu
+
+    def variance(self) -> float:
+        return self.sigma**2
+
+    # ---------- operators ----------
+
+    def __add__(self, other: Normal) -> Normal:
+        """Convolution of two independent Normal distributions."""
+        if not isinstance(other, Normal):
+            return NotImplemented
+        new_mu = self.mu + other.mu
+        new_sigma = np.sqrt(self.sigma**2 + other.sigma**2)
+        return Normal(new_mu, new_sigma)
+
+    def __mul__(self, scalar: float) -> Normal:
+        """Affine scaling: if X ~ N(mu, sigma), then c*X ~ N(c*mu, |c|*sigma)."""
+        if not isinstance(scalar, (int, float)):
+            return NotImplemented
+        return Normal(scalar * self.mu, abs(scalar) * self.sigma)
+
+    def __rmul__(self, scalar: float) -> Normal:
+        return self.__mul__(scalar)
+
+    def __repr__(self) -> str:
+        return f"Normal(mu={self.mu}, sigma={self.sigma})"
 
 
 class LogNormal(Dist):
-    """Log-normal distribution.
-    
-    A log-normal distribution is the distribution of a random variable whose
-    logarithm is normally distributed.
-    
-    Args:
-        mu: Mean of the underlying normal distribution (default: 0.0).
-        sigma: Standard deviation of the underlying normal distribution (default: 1.0).
-        
-    Example:
-        >>> lognorm = LogNormal(0, 1)
-        >>> samples = lognorm.sample(1000)
+    """Log-normal distribution parameterised by *mu* and *sigma* of the
+    underlying normal (i.e. ``ln(X) ~ N(mu, sigma)``).
+
+    Supports scaling via ``*`` (multiplying a log-normal RV by a positive
+    constant shifts *mu*).
     """
-    
-    def __init__(self, mu: float = 0.0, sigma: float = 1.0):
-        """Initialize Log-normal distribution.
-        
-        Args:
-            mu: Mean of the underlying normal distribution.
-            sigma: Standard deviation of the underlying normal distribution.
-            
-        Raises:
-            ValueError: If sigma <= 0.
-        """
-        if sigma <= 0:
-            raise ValueError("sigma must be positive")
-        self.mu = mu
-        self.sigma = sigma
-        self._dist = stats.lognorm(s=sigma, scale=np.exp(mu))
-    
-    def sample(self, n: int) -> np.ndarray:
-        """Draw random samples from the log-normal distribution.
-        
-        Args:
-            n: Number of samples to draw.
-            
-        Returns:
-            Array of shape (n,) containing random samples.
-        """
+
+    def __init__(self, mu: float = 0.0, sigma: float = 1.0) -> None:
+        if sigma < 0:
+            raise ValueError("sigma must be non-negative")
+        self.mu = float(mu)
+        self.sigma = float(sigma)
+        self._degenerate = self.sigma == 0.0
+        if not self._degenerate:
+            # scipy's lognorm: s=sigma, scale=exp(mu)
+            self._dist = stats.lognorm(s=self.sigma, scale=np.exp(self.mu))
+
+    # ---------- core API ----------
+
+    def sample(self, n: int = 1) -> np.ndarray:
+        if self._degenerate:
+            return np.full(n, np.exp(self.mu))
         return self._dist.rvs(size=n)
-    
+
     def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the probability density function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the PDF.
-            
-        Returns:
-            Probability density at x.
-        """
+        if self._degenerate:
+            x = np.asarray(x, dtype=float)
+            return np.where(x == np.exp(self.mu), np.inf, 0.0)
         return self._dist.pdf(x)
-    
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the cumulative distribution function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the CDF.
-            
-        Returns:
-            Cumulative probability at x.
-        """
+        if self._degenerate:
+            x = np.asarray(x, dtype=float)
+            return np.where(x >= np.exp(self.mu), 1.0, 0.0)
         return self._dist.cdf(x)
-    
+
     def quantile(self, q: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the quantile function (inverse CDF) at q.
-        
-        Args:
-            q: Probability value(s) in [0, 1] at which to compute quantiles.
-            
-        Returns:
-            Quantile value(s) corresponding to q.
-        """
+        if self._degenerate:
+            return np.full_like(np.asarray(q, dtype=float), np.exp(self.mu))
         return self._dist.ppf(q)
+
+    def mean(self) -> float:
+        if self._degenerate:
+            return float(np.exp(self.mu))
+        return float(self._dist.mean())
+
+    def variance(self) -> float:
+        if self._degenerate:
+            return 0.0
+        return float(self._dist.var())
+
+    # ---------- operators ----------
+
+    def __mul__(self, scalar: float) -> LogNormal:
+        """Scaling a log-normal RV by a positive constant *c*:
+        if X ~ LogNormal(mu, sigma), then c*X ~ LogNormal(mu + ln(c), sigma).
+        """
+        if not isinstance(scalar, (int, float)):
+            return NotImplemented
+        if scalar <= 0:
+            raise ValueError("LogNormal can only be scaled by a positive constant")
+        return LogNormal(self.mu + np.log(scalar), self.sigma)
+
+    def __rmul__(self, scalar: float) -> LogNormal:
+        return self.__mul__(scalar)
+
+    def __repr__(self) -> str:
+        return f"LogNormal(mu={self.mu}, sigma={self.sigma})"
 
 
 class Beta(Dist):
-    """Beta distribution.
-    
-    The beta distribution is defined on the interval [0, 1] and is
-    parameterized by two positive shape parameters alpha and beta.
-    
-    Args:
-        alpha: First shape parameter (default: 1.0).
-        beta: Second shape parameter (default: 1.0).
-        
-    Example:
-        >>> beta_dist = Beta(2, 5)
-        >>> samples = beta_dist.sample(1000)
+    """Beta distribution parameterised by *alpha* and *beta* shape parameters.
+
+    Supports scaling via ``*`` (result is a scaled Beta on ``[0, c]``
+    rather than ``[0, 1]``).  Internally this is tracked via *loc* and *scale*
+    of :func:`scipy.stats.beta`.
     """
-    
-    def __init__(self, alpha: float = 1.0, beta: float = 1.0):
-        """Initialize Beta distribution.
-        
-        Args:
-            alpha: First shape parameter.
-            beta: Second shape parameter.
-            
-        Raises:
-            ValueError: If alpha <= 0 or beta <= 0.
-        """
+
+    def __init__(
+        self,
+        alpha: float = 1.0,
+        beta: float = 1.0,
+        *,
+        loc: float = 0.0,
+        scale: float = 1.0,
+    ) -> None:
         if alpha <= 0 or beta <= 0:
             raise ValueError("alpha and beta must be positive")
-        self.alpha = alpha
-        self.beta = beta
-        self._dist = stats.beta(a=alpha, b=beta)
-    
-    def sample(self, n: int) -> np.ndarray:
-        """Draw random samples from the beta distribution.
-        
-        Args:
-            n: Number of samples to draw.
-            
-        Returns:
-            Array of shape (n,) containing random samples.
-        """
+        self.alpha = float(alpha)
+        self.beta = float(beta)
+        self.loc = float(loc)
+        self.scale = float(scale)
+        self._dist = stats.beta(self.alpha, self.beta, loc=self.loc, scale=self.scale)
+
+    # ---------- core API ----------
+
+    def sample(self, n: int = 1) -> np.ndarray:
         return self._dist.rvs(size=n)
-    
+
     def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the probability density function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the PDF.
-            
-        Returns:
-            Probability density at x.
-        """
         return self._dist.pdf(x)
-    
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the cumulative distribution function at x.
-        
-        Args:
-            x: Point(s) at which to evaluate the CDF.
-            
-        Returns:
-            Cumulative probability at x.
-        """
         return self._dist.cdf(x)
-    
+
     def quantile(self, q: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        """Compute the quantile function (inverse CDF) at q.
-        
-        Args:
-            q: Probability value(s) in [0, 1] at which to compute quantiles.
-            
-        Returns:
-            Quantile value(s) corresponding to q.
-        """
         return self._dist.ppf(q)
+
+    def mean(self) -> float:
+        return float(self._dist.mean())
+
+    def variance(self) -> float:
+        return float(self._dist.var())
+
+    # ---------- operators ----------
+
+    def __mul__(self, scalar: float) -> Beta:
+        """Scale the support by a constant: if X ~ Beta(a, b) on [loc, loc+scale],
+        then c*X ~ Beta(a, b) on [c*loc, c*loc + c*scale].
+        """
+        if not isinstance(scalar, (int, float)):
+            return NotImplemented
+        return Beta(
+            self.alpha, self.beta, loc=scalar * self.loc, scale=scalar * self.scale
+        )
+
+    def __rmul__(self, scalar: float) -> Beta:
+        return self.__mul__(scalar)
+
+    def __repr__(self) -> str:
+        return f"Beta(alpha={self.alpha}, beta={self.beta})"
