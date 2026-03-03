@@ -46,11 +46,11 @@ class Dist(ABC):
         """Compute the quantile function (inverse CDF) at q."""
         pass
 
-    def __add__(self, other: Dist) -> Dist:
+    def __add__(self, other: "Dist") -> "Dist":
         """Create a distribution representing the sum of two distributions."""
         return SumDist(self, other)
 
-    def __mul__(self, other: Dist) -> Dist:
+    def __mul__(self, other: "Dist") -> "Dist":
         """Create a distribution representing the product of two distributions."""
         return ProductDist(self, other)
 

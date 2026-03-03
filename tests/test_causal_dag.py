@@ -1,8 +1,7 @@
 """Tests for probflow.causal.dag – CausalDAG with do-calculus support.
 
-Note: ConditionalDist coerces string labels to float (pre-existing behavior),
-so comparisons on child samples use numeric values (e.g. ``== 1.0``)
-rather than string labels (e.g. ``== "1"``).
+Note: Categorical distributions with string labels return string samples,
+so comparisons on child samples use string values (e.g. ``== "1"``).
 """
 
 import numpy as np
@@ -138,7 +137,7 @@ class TestDoOperator:
         dag = self._simple_dag()
         intervened = dag.do("X", "1")
         samples = intervened.sample(20_000)
-        y_one_frac = (samples["Y"] == 1.0).mean()
+        y_one_frac = (samples["Y"] == "1").mean()
         assert abs(y_one_frac - 0.7) < 0.03
 
     def test_do_effect_x_zero(self) -> None:
@@ -146,7 +145,7 @@ class TestDoOperator:
         dag = self._simple_dag()
         intervened = dag.do("X", "0")
         samples = intervened.sample(20_000)
-        y_one_frac = (samples["Y"] == 1.0).mean()
+        y_one_frac = (samples["Y"] == "1").mean()
         assert abs(y_one_frac - 0.2) < 0.03
 
     def test_original_dag_unchanged(self) -> None:
@@ -243,13 +242,13 @@ class TestSimpsonsParadox:
         # Observational: sample and condition on X=1
         n = 50_000
         obs_samples = dag.sample(n)
-        x1_mask = obs_samples["X"] == 1.0
-        obs_y1_given_x1 = (obs_samples["Y"][x1_mask] == 1.0).mean()
+        x1_mask = obs_samples["X"] == "1"
+        obs_y1_given_x1 = (obs_samples["Y"][x1_mask] == "1").mean()
 
         # Interventional: do(X=1) cuts Z→X
         int_dag = dag.do("X", "1")
         int_samples = int_dag.sample(n)
-        int_y1 = (int_samples["Y"] == 1.0).mean()
+        int_y1 = (int_samples["Y"] == "1").mean()
 
         # In this model, Y depends on Z only (not X directly).
         # Observationally, X=1 is more common for males (lower Y=1).
@@ -519,7 +518,7 @@ class TestCounterfactual:
             evidence={"X": "0"},
             n=50_000,
         )
-        y1_frac = (cf["Y"] == 1.0).mean()
+        y1_frac = (cf["Y"] == "1").mean()
         assert abs(y1_frac - 0.9) < 0.05
 
     def test_counterfactual_no_match_raises(self) -> None:
@@ -553,7 +552,7 @@ class TestInterventionalSample:
         dag.add_node("Y", y, parents=["X"])
         samples = dag.interventional_sample({"X": "1"}, n=10_000)
         assert (samples["X"] == "1").all()
-        y1_frac = (samples["Y"] == 1.0).mean()
+        y1_frac = (samples["Y"] == "1").mean()
         assert abs(y1_frac - 0.7) < 0.05
 
 

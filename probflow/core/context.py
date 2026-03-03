@@ -35,7 +35,7 @@ class ProbFlow:
         ProbFlow._active_context = self
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Exit the ProbFlow context.
         
         Args:
@@ -43,11 +43,8 @@ class ProbFlow:
             exc_val: Exception value if an exception was raised.
             exc_tb: Exception traceback if an exception was raised.
             
-        Returns:
-            False to propagate any exceptions.
         """
         ProbFlow._active_context = self._parent_context
-        return False
     
     def add_distribution(self, dist: Any, name: Optional[str] = None) -> None:
         """Register a distribution within this context.

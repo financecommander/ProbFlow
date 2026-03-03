@@ -74,10 +74,12 @@ def belief_propagation(root: Node, nodes: List[Node]) -> Dict[str, np.ndarray]:
                 if id(sibling) != id(child):
                     sib_idx = node_idx[id(sibling)]
                     sib_msg = msg_up.get(sib_idx, np.ones(sibling.variable.num_states))
+                    assert sibling.cpt is not None
                     incoming = sibling.cpt @ sib_msg
                     parent_belief *= incoming
 
             # Compute message to child
+            assert child.cpt is not None
             child_msg = child.cpt.T @ parent_belief  # shape: (child_states,)
             total = child_msg.sum()
             if total > 0:

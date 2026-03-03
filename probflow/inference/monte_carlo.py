@@ -57,6 +57,7 @@ def forward_sample(
                 mask = parent_states == ps
                 count = mask.sum()
                 if count > 0:
+                    assert node.cpt is not None
                     probs = node.cpt[ps]
                     samples[mask, idx] = rng.choice(ns, size=count, p=probs)
 

@@ -117,7 +117,10 @@ class ConditionalDist:
                 f"must equal n ({n})"
             )
 
-        result = np.empty(n, dtype=float)
+        # Detect output dtype by probing the first child distribution
+        first_dist = next(iter(self.mapping.values()))
+        probe = first_dist.sample(1)
+        result = np.empty(n, dtype=probe.dtype)
 
         if self._continuous_parent:
             self._sample_continuous(parent_samples, result)

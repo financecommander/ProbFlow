@@ -86,6 +86,7 @@ class FactorTable:
         cards = [p.variable.num_states for p in node.parents] + [
             node.variable.num_states
         ]
+        assert node.cpt is not None, f"Node {node.name} has no CPT"
         return cls(var_names, cards, node.cpt.copy())
 
     # ----- core operations ------------------------------------------------
@@ -131,7 +132,7 @@ class FactorTable:
         if var not in self.variables:
             raise ValueError(f"Variable '{var}' not in factor")
         axis = self.variables.index(var)
-        slices = [slice(None)] * len(self.variables)
+        slices: list = [slice(None)] * len(self.variables)
         slices[axis] = state_idx
         new_values = self.values[tuple(slices)]
         new_vars = [v for v in self.variables if v != var]
@@ -307,9 +308,11 @@ def belief_propagation(
                         sib_idx,
                         np.ones(sibling.variable.num_states),
                     )
+                    assert sibling.cpt is not None
                     incoming = sibling.cpt @ sib_msg
                     parent_belief *= incoming
 
+            assert child.cpt is not None
             child_msg = child.cpt.T @ parent_belief
             total = child_msg.sum()
             if total > 0:

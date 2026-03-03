@@ -18,7 +18,7 @@ Inference methods:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -135,7 +135,7 @@ class BeliefNetwork:
     #  Evidence
     # ------------------------------------------------------------------ #
 
-    def observe(self, variable: str, evidence: object) -> None:
+    def observe(self, variable: str, evidence: Union[str, int]) -> None:
         """Set observed evidence on a variable.
 
         Parameters

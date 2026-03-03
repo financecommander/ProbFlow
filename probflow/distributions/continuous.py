@@ -58,7 +58,7 @@ class Normal(Dist):
 
     # ---------- operators ----------
 
-    def __add__(self, other: Normal) -> Normal:
+    def __add__(self, other: Normal) -> Normal:  # type: ignore[override]
         """Convolution of two independent Normal distributions."""
         if not isinstance(other, Normal):
             return NotImplemented
@@ -66,7 +66,7 @@ class Normal(Dist):
         new_sigma = np.sqrt(self.sigma**2 + other.sigma**2)
         return Normal(new_mu, new_sigma)
 
-    def __mul__(self, scalar: float) -> Normal:
+    def __mul__(self, scalar: float) -> Normal:  # type: ignore[override]
         """Affine scaling: if X ~ N(mu, sigma), then c*X ~ N(c*mu, |c|*sigma)."""
         if not isinstance(scalar, (int, float)):
             return NotImplemented
@@ -133,7 +133,7 @@ class LogNormal(Dist):
 
     # ---------- operators ----------
 
-    def __mul__(self, scalar: float) -> LogNormal:
+    def __mul__(self, scalar: float) -> LogNormal:  # type: ignore[override]
         """Scaling a log-normal RV by a positive constant *c*:
         if X ~ LogNormal(mu, sigma), then c*X ~ LogNormal(mu + ln(c), sigma).
         """
@@ -196,7 +196,7 @@ class Beta(Dist):
 
     # ---------- operators ----------
 
-    def __mul__(self, scalar: float) -> Beta:
+    def __mul__(self, scalar: float) -> Beta:  # type: ignore[override]
         """Scale the support by a constant: if X ~ Beta(a, b) on [loc, loc+scale],
         then c*X ~ Beta(a, b) on [c*loc, c*loc + c*scale].
         """

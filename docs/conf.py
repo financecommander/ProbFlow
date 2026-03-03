@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import os
+import shutil
 import sys
 
 # -- Path setup --------------------------------------------------------------
@@ -22,8 +23,17 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
-    "nbsphinx",
 ]
+
+# Only enable nbsphinx if pandoc is available
+if shutil.which("pandoc"):
+    extensions.append("nbsphinx")
+else:
+    # Exclude notebook files when pandoc is not installed
+    exclude_patterns = [
+        "_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints",
+        "tutorials/*.ipynb",
+    ]
 
 # Napoleon settings (Google-style docstrings)
 napoleon_google_docstrings = True
@@ -36,7 +46,8 @@ autodoc_member_order = "bysource"
 autodoc_typehints = "description"
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+if "exclude_patterns" not in dir():
+    exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
@@ -55,6 +66,7 @@ latex_documents = [
 
 # -- nbsphinx configuration -------------------------------------------------
 nbsphinx_execute = "never"
+nbsphinx_allow_errors = True
 
 # -- Intersphinx configuration -----------------------------------------------
 intersphinx_mapping = {

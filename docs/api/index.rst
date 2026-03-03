@@ -6,3 +6,10 @@ API Reference
 
    core
    distributions
+   networks
+   inference
+   causal
+   temporal
+   decision
+   integration
+   viz
