@@ -173,6 +173,65 @@ See `WHITEPAPER.md` for a comprehensive technical overview covering architecture
 
 See `docs/` for Sphinx API reference, theory guides, and Jupyter notebook tutorials.
 
+---
+
+## Shapeshifter Architecture — Three-Layer Model
+
+This repository is part of the **Shapeshifter Orchestration Model**, a three-layer architecture for adaptive multi-agent workflows, distributed execution, and compression-aware model routing.
+
+```
+Adaptive Layer        → Shapeshifter (system-wide orchestration model)
+Control Plane         → super-duper-spork + Orchestra + AI-PORTAL
+Execution Plane       → Triton + BUNNY + distributed workers
+```
+
+### Role of `ProbFlow`
+
+**Layer:** Adaptive Layer
+
+ProbFlow provides the **routing intelligence** for the Adaptive Layer.
+
+Responsibilities within the Shapeshifter architecture:
+
+- uncertainty scoring for task classification
+- routing optimization (workflow shape, compression profile, escalation policy)
+- confidence scoring for validation routing
+- expected value estimation for cost-optimal model selection
+- telemetry regression for auto-tuning routing weights
+
+### Repository Responsibility Matrix
+
+| Layer     | Component        | Repository          | Role                            |
+| --------- | ---------------- | ------------------- | ------------------------------- |
+| Adaptive  | Routing & Policy | `ProbFlow`          | uncertainty scoring and routing |
+| Control   | Workflow DSL     | `Orchestra`         | task graph definition           |
+| Control   | Swarm Runtime    | `super-duper-spork` | scheduling and orchestration    |
+| Execution | Model Runtime    | `Triton`            | AI inference and compression    |
+| Execution | Worker Runtime   | `BUNNY`             | distributed execution           |
+| Interface | UI & Telemetry   | `AI-PORTAL`         | monitoring and user interaction |
+
+### Execution Lifecycle
+
+```
+Task Input → Task Classification → Workflow Selection → Task Graph Compilation
+    → Worker Dispatch → Model Execution → Validation → Result Synthesis
+```
+
+### Telemetry Feedback Loop
+
+```
+Triton runtime metrics → AI-PORTAL dashboards → ProbFlow routing models → Shapeshifter policy updates
+```
+
+### Goals & Roadmap
+
+See the [Orchestra README](https://github.com/financecommander/Orchestra#architecture-overview-shapeshifter-orchestration-model) for the full architecture specification, goals, and 7-phase roadmap.
+
+> **Engineering principle:** Use the smallest reliable model and workflow capable of completing the task safely.
+
+
+---
+
 ## License
 
 See LICENSE file for details.
