@@ -1,37 +1,31 @@
 import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, List, Any
 
 class BayesianNetwork:
-    def __init__(self, nodes: List[str], edges: List[Tuple[str, str]], cpts: Dict[str, np.ndarray]):
-        self.nodes = nodes
-        self.edges = edges
-        self.cpts = cpts  # Conditional Probability Tables
-        self.parents = {n: [p for p, c in edges if c == n] for n in nodes}
-
-    def infer(self, evidence: Dict[str, float]) -> Dict[str, np.ndarray]:
-        # Simple exact inference placeholder using joint probability factorization
-        result = {}
-        for node in self.nodes:
-            if node in evidence:
-                result[node] = np.array([1.0 if v == evidence[node] else 0.0 for v in range(2)])
+    def __init__(self):
+        self.nodes: Dict[str, Any] = {}
+        self.parents: Dict[str, List[str]] = {}
+        self.cpts: Dict[str, np.ndarray] = {}
+    
+    def add_node(self, name: str, parents: List[str], cpt: np.ndarray):
+        self.nodes[name] = len(self.nodes)
+        self.parents[name] = parents
+        self.cpts[name] = cpt
+    
+    def exact_inference(self, query: str, evidence: Dict[str, int]) -> np.ndarray:
+        # Simplified variable elimination for inference
+        # TODO: Implement full variable elimination algorithm
+        return self.cpts[query][tuple(evidence.get(p, 0) for p in self.parents[query])]
+    
+    def sample(self, n_samples: int = 1) -> Dict[str, np.ndarray]:
+        samples = {n: np.zeros(n_samples) for n in self.nodes}
+        topo_order = list(self.nodes.keys())  # Assume topological order for simplicity
+        for node in topo_order:
+            parents_vals = [samples[p] for p in self.parents[node]]
+            if parents_vals:
+                idx = tuple(parents_vals)
+                probs = self.cpts[node][idx]
             else:
-                result[node] = self._compute_marginal(node, evidence)
-        return result
-
-    def _compute_marginal(self, node: str, evidence: Dict[str, float]) -> np.ndarray:
-        # Placeholder for marginal computation
-        return np.array([0.5, 0.5])
-
-    def sample(self, n: int = 1) -> Dict[str, np.ndarray]:
-        samples = {node: np.zeros(n) for node in self.nodes}
-        for i in range(n):
-            for node in self._topological_sort():
-                parents = self.parents[node]
-                parent_vals = tuple(samples[p][i] for p in parents)
-                cpt = self.cpts[node]
-                prob = cpt[parent_vals] if parents else cpt
-                samples[node][i] = np.random.binomial(1, prob)
+                probs = self.cpts[node]
+            samples[node] = np.random.choice(len(probs), size=n_samples, p=probs)
         return samples
-
-    def _topological_sort(self) -> List[str]:
-        return self.nodes  # Simplified, assumes nodes are already sorted
