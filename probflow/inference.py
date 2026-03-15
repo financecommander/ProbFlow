@@ -1,32 +1,33 @@
 from typing import Dict, List
 import numpy as np
-from .bayesian import BayesianNetwork
 
 class ExactInference:
-    def __init__(self, model: BayesianNetwork):
+    def __init__(self, model):
         self.model = model
-    
-    def query(self, query: str, evidence: Dict[str, float]) -> np.ndarray:
-        # TODO: Implement belief propagation or variable elimination
-        return self.model.exact_inference(query, evidence)
+
+    def infer(self, evidence: Dict[str, float]) -> Dict[str, np.ndarray]:
+        # Placeholder for belief propagation or variable elimination
+        return self.model.infer(evidence)
 
 class MonteCarloInference:
-    def __init__(self, model: BayesianNetwork, n_samples: int = 1000):
+    def __init__(self, model, n_samples: int = 1000):
         self.model = model
         self.n_samples = n_samples
-    
-    def query(self, query: str, evidence: Dict[str, float]) -> np.ndarray:
+
+    def infer(self, evidence: Dict[str, float]) -> Dict[str, np.ndarray]:
         samples = self.model.sample(self.n_samples)
-        # TODO: Filter samples based on evidence and compute query distribution
-        return np.histogram(samples[query], density=True)[0]
+        result = {}
+        for node in samples:
+            if node not in evidence:
+                result[node] = np.bincount(samples[node].astype(int)) / self.n_samples
+        return result
 
 class MCMCInference:
-    def __init__(self, model: BayesianNetwork, n_samples: int = 1000, burn_in: int = 100):
+    def __init__(self, model, n_samples: int = 1000, burn_in: int = 100):
         self.model = model
         self.n_samples = n_samples
         self.burn_in = burn_in
-    
-    def query(self, query: str, evidence: Dict[str, float]) -> np.ndarray:
-        # TODO: Implement Gibbs sampling or Metropolis-Hastings
-        samples = self.model.sample(self.n_samples + self.burn_in)
-        return np.histogram(samples[query][self.burn_in:], density=True)[0]
+
+    def infer(self, evidence: Dict[str, float]) -> Dict[str, np.ndarray]:
+        # Placeholder for Markov Chain Monte Carlo
+        return MonteCarloInference(self.model, self.n_samples - self.burn_in).infer(evidence)

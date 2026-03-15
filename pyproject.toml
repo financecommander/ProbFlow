@@ -2,20 +2,20 @@
 name = "probflow"
 version = "0.1.0"
 description = "Probabilistic programming library for Bayesian and causal inference"
-authors = ["Sean <sean@calculus.ai>"]
+authors = ["Sean <sean@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
 numpy = "^1.26.0"
-scipy = "^1.14.0"
-networkx = "^3.3"
-matplotlib = "^3.9.0"
-pymc = "^5.16.0"
+scipy = "^1.11.0"
+networkx = "^3.1"
+matplotlib = "^3.8.0"
+pymc = "^5.10.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^8.3.0"
-pytest-cov = "^5.0.0"
-black = "^24.8.0"
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+black = "^23.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
