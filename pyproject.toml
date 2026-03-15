@@ -1,96 +1,22 @@
-[build-system]
-requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "probflow"
-dynamic = ["version"]
-description = "Python DSL for probabilistic modeling"
-readme = "README.md"
-license = {text = "MIT"}
-requires-python = ">=3.9"
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Scientific/Engineering",
-]
-dependencies = [
-    "numpy>=1.20.0",
-    "scipy>=1.7.0",
-    "networkx>=2.6",
-    "matplotlib>=3.4",
-]
+version = "0.1.0"
+description = "A probabilistic programming library for Python"
+authors = ["Sean <sean@example.com>"]
 
-[project.optional-dependencies]
-pymc = ["pymc>=5.0"]
-gpu = ["torch>=1.10.0"]
-viz = ["plotly>=5.0", "graphviz>=0.20"]
-dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "pytest-benchmark>=4.0",
-    "black>=23.0",
-    "mypy>=1.0",
-    "ruff>=0.1.0",
-    "pre-commit>=3.0",
-    "plotly>=5.0",
-    "graphviz>=0.20",
-]
-docs = [
-    "sphinx>=6.0",
-    "sphinx-rtd-theme>=1.0",
-    "nbsphinx>=0.9",
-]
-all = [
-    "probflow[pymc,gpu,viz,docs]",
-]
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^1.26.0"
+scipy = "^1.11.0"
+networkx = "^3.2.1"
+matplotlib = "^3.8.0"
+pymc = "^5.10.0"
 
-[project.urls]
-Homepage = "https://github.com/financecommander/ProbFlow"
-Repository = "https://github.com/financecommander/ProbFlow"
-Issues = "https://github.com/financecommander/ProbFlow/issues"
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+black = "^23.9.1"
 
-[tool.setuptools-scm]
-version_file = "probflow/_version.py"
-
-[tool.setuptools.packages.find]
-include = ["probflow*"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-v"
-
-[tool.black]
-line-length = 88
-target-version = ["py39"]
-
-[tool.ruff]
-line-length = 88
-target-version = "py39"
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP"]
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = false
-warn_unused_configs = true
-ignore_missing_imports = true
-check_untyped_defs = true
-disallow_untyped_defs = false
-no_implicit_optional = true
-
-[[tool.mypy.overrides]]
-module = "probflow.distributions.*"
-disallow_untyped_defs = false
-
-[[tool.mypy.overrides]]
-module = "probflow.inference.*"
-disallow_untyped_defs = false
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
