@@ -22,10 +22,10 @@ ProbFlow unifies probability distributions, Bayesian networks, causal inference,
 
 ```bash
 # Core
-pip install numpy scipy networkx matplotlib
+pip install numpy scipy torch networkx matplotlib
 
 # Optional: MCMC sampling
-pip install pymc arviz
+pip install 'probflow[pymc]'
 
 # Optional: Interactive plots
 pip install plotly
@@ -161,6 +161,7 @@ python -m pytest tests/test_causal_dag.py -v
 |---------|---------|----------|
 | numpy | >= 1.20 | Yes |
 | scipy | >= 1.7 | Yes |
+| torch | >= 1.10 | Yes |
 | networkx | >= 2.6 | Yes |
 | matplotlib | >= 3.4 | Yes |
 | pymc | >= 5.0 | Optional (MCMC) |
